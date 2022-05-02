@@ -14,3 +14,4 @@
 
 
 Route::get("/", "RogoController@index");
+Route::get("/", "TrendController@index");

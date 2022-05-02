@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'stripe' => [
+        'tc_key'=>env('TWITTER_CLIENT_ID'),
+        'tcs_key'=>env('TWITTER_CLIENT_SECRET'),
+        'at_key'=>env('TWITTER_CLIENT_ID_ACCESS_TOKEN'),
+        'iat_key'=>('TWITTER_CLIENT_ID_ACCESS_TOKEN_SECRET')
+    ],
 
     /*
     |--------------------------------------------------------------------------
