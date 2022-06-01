@@ -7,36 +7,53 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 
 class callTwitterApi
 {
-
-    private $t;
+    private $twi;
+    private $CK = 'QT6eXIOM96jSULov1sRp83vOy';
+    private $CS = 'JwMlrcMQrB4JtvgL6xdfnNphhpDa89vosp8v9BNLGq54fcHcXU';
+    private $AT = '839111512652304384-dRYyjCe1h0fXTsa68DwNqt2FtEKtJp1';
+    private $AS = 'hzS5DGWkkfphsAiUavxyP4PPkFwkjRwmABtgXDusNZSxM';
+    private $bearer = 'AAAAAAAAAAAAAAAAAAAAAGzlbwEAAAAAtzRp5yAIkdBaKB8PV0yT0gE%2BeZs%3DogGBL4me9KLuvuIeBepihUXwQqeQtuxUBDrxPLX6lOrlTjezlM';
 
     public function __construct()
     {
+        $this->twi = new TwitterOAuth(
+            $this->CK,
+            $this->CS,
+            $this->AT,
+            $this->AS
 
-        $this->t = new TwitterOAuth(config('services.stripe.tc_key'),config('services.stripe.tcs_key'),
-            config('services.stripe.at_key'),config('services.stripe.iat_key'));
+        );
+        //$this->twi->setApiVersion('2');
     }
 
-    // ツイート検索
-    public function serachTweets(String $searchWord)
-    {
-        $d = $this->t->get("search/tweets", [
-            'q' => $searchWord,
-            'count' => 3,
-         ]);
 
-        return $d->statuses;
+    public function get_trend(){
+
+
+        $request=$this->twi->OAuthRequest("https://api.twitter.com/1.1/trends/place.json","GET",array("id"=>'23424856'));
+        $data =  json_decode($request,true);
+        return $data;
+    }
+    public function get_tweet(){
+
+        $query = "美味しい #ラーメン -is:retweet -has:mentions"; // RTを除外したい時
+
+
+        $params = [
+    /*
+    ※queryとmax_resultは必須
+    */
+            "query" => $query,
+            "start_time" => "2022-5-21T00:00:00+09:00",
+            "end_time" => "2022-5-27T00:00:00+09:00",
+            "tweet.fields" => "author_id,created_at", // 今回は追加で投稿日時を指定
+            'expansions' => 'author_id',
+            "user.fields" => "id,name,username,description,profile_image_url",//画像サイズは _normal を消せばオリジナルサイズになる
+            "max_results" => 100 // 10～100の間を指定
+        ];
+
+        $res = $this->twi->get("tweets/search/recent", $params);
+        return $res;
     }
 
-    public function getTrend(){
-
-        $d = $this->t->get('trends/place', ['id' => '2345896']);
-        foreach ($d->trends as $key => $trend) {
-            // 接続に成功した場合に行う処理
-                echo '<' . ++$key . '>' . PHP_EOL;
-                echo '<h3 style="color:#1d2088"><a href="' . $trend->url . '"target="_blank" rel="noopener noreferrer">' . $trend->name . '</a></h3>' . PHP_EOL;
-                echo $trend->tweet_volume . '件のツイート' . PHP_EOL;
-                echo '<hr noshade>' . PHP_EOL;
-            }
-    }
 }
